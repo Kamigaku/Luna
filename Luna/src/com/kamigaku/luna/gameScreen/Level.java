@@ -61,7 +61,7 @@ public class Level {
 		FixtureDef fixture = new FixtureDef();
 		fixture.shape = polygon;
 		fixture.density = 0.4f;
-		fixture.friction = 0.2f;
+		fixture.friction = 0.5f;
 		fixture.restitution = 0.0f;
 		rectangleBody.createFixture(fixture);
 		this.player.playerBody = rectangleBody;
