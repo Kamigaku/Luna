@@ -1,19 +1,46 @@
 package com.kamigaku.luna.entity;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class Player {
 
 	public Body playerBody;
-	private float x;
-	private float y;
+	public BodyDef bodyDefPlayer;
+	public PolygonShape polygonPlayer;
+	public FixtureDef fixturePlayer;
 	public float vectorX;
+	public float vectorY;
+	public float maxVectorX;
+	public float maxVectorY;
 	
 	
-	public Player() {
-		this.vectorX = 30f;
+	public Player(int positionX, int positionY, int tileHeight, World world) {
+		bodyDefPlayer = new BodyDef();
+		bodyDefPlayer.type = BodyType.DynamicBody;
+		bodyDefPlayer.position.set(positionX, (positionY * tileHeight) + 50);
+		playerBody = world.createBody(bodyDefPlayer);
+		polygonPlayer = new PolygonShape();
+		polygonPlayer.setAsBox(50, 50);
+		fixturePlayer = new FixtureDef();
+		fixturePlayer.shape = polygonPlayer;
+		fixturePlayer.density = 0.8f;
+		fixturePlayer.friction = 0.5f;
+		fixturePlayer.restitution = 0.0f;
+		playerBody.createFixture(fixturePlayer);
+		playerBody.setFixedRotation(true);
+		this.vectorX = 5f;
+		this.vectorY = 5f;
+		this.maxVectorX = 70f;
+		this.maxVectorY = 70f;
+	}
+	
+	public Vector2 getTargetPos() {
+		return this.playerBody.getPosition();
 	}
 }
