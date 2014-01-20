@@ -24,6 +24,7 @@ public class TestScreen implements Screen {
 	private Box2DDebugRenderer rendererBox2D;
 	private boolean toLeft, toRight, jumping, falling;
 	private Player player;
+	private boolean againstWall;
 
 	public TestScreen(MainClass game) {
 		this.game = game;
@@ -49,10 +50,6 @@ public class TestScreen implements Screen {
 	    		this.falling = true;
 	    		this.jumping = false;
 	    	}
-	    	else if(player.playerBody.getLinearVelocity().y > 0.0f) {
-	    		this.falling = false;
-	    		this.jumping = true;
-	    	}
 	    	else {
 	    		this.falling = false;
 	    		this.jumping = false;
@@ -66,20 +63,33 @@ public class TestScreen implements Screen {
 	    		bodyIsWall(contact, contact.getFixtureA().getBody());
 	    	}
 	    }
-	    if(jumping) {
+	    if(againstWall && jumping) {
+	    	System.out.println("ici");
+	    	if(toRight) {
+	    		System.out.println("vers la gauche");
+	    		player.playerBody.applyLinearImpulse(new Vector2(50000 * -player.maxVectorX, 50000 * player.maxVectorY), player.playerBody.getWorldCenter(), true);
+	    	}
+	    	else if(toLeft) {
+	    		System.out.println("vers la droite");
+	    		player.playerBody.applyLinearImpulse(new Vector2(50000 * player.maxVectorX, 50000 * player.maxVectorY), player.playerBody.getWorldCenter(), true);
+	    	}
+	    }
+	    else if(jumping) {
 	    	jumping = false;
-		    if(toRight) {
-		    	player.playerBody.applyLinearImpulse(new Vector2(50000 * player.maxVectorX, 50000 * player.maxVectorY), player.playerBody.getWorldCenter(), true);
-		    }
 		    if(toLeft) {
 		    	player.playerBody.applyLinearImpulse(new Vector2(50000 * -player.maxVectorX, 50000 * player.maxVectorY), player.playerBody.getWorldCenter(), true);
+		    }
+		    if(toRight) {
+		    	player.playerBody.applyLinearImpulse(new Vector2(50000 * player.maxVectorX, 50000 * player.maxVectorY), player.playerBody.getWorldCenter(), true);
 		    }
 	    }
 	    else {
 		    if(toRight) {
+//		    	player.playerBody.setLinearVelocity(player.maxVectorX, player.playerBody.getLinearVelocity().y);
 		    	player.playerBody.applyLinearImpulse(new Vector2(50 * player.maxVectorX, player.playerBody.getLinearVelocity().y), player.playerBody.getWorldCenter(), true);
 		    }
-		    if(toLeft) {
+		    else if(toLeft) {
+//		    	player.playerBody.setLinearVelocity(-player.maxVectorX, player.playerBody.getLinearVelocity().y);
 		    	player.playerBody.applyLinearImpulse(new Vector2(50 * -player.maxVectorX, player.playerBody.getLinearVelocity().y), player.playerBody.getWorldCenter(), true);
 		    }
 	    }
@@ -90,7 +100,10 @@ public class TestScreen implements Screen {
 		ObjectMap<String, Body> bodies = parser.getBodies();
 		String keyOfBody = bodies.findKey(body, false);
 		if(keyOfBody.contains("Wall")) {
-			contact.setRestitution(2f);
+			this.againstWall = true;
+		}
+		else {
+			this.againstWall = false;
 		}
 	}
 	
@@ -106,6 +119,7 @@ public class TestScreen implements Screen {
 	public void show() {
 		levelDatas = new Level("map/map.tmx");
 		this.player = levelDatas.player;
+		this.againstWall = false;
 		rendererBox2D = new Box2DDebugRenderer();
 		Gdx.input.setInputProcessor(new InputProcessor() {
 
@@ -142,6 +156,12 @@ public class TestScreen implements Screen {
 			
 			@Override
 			public boolean keyTyped(char character) {
+				if(character == 'd') {
+					toRight = true;
+				}
+				if(character == 'q') {
+					toLeft = true;
+				}
 				return false;
 			}
 			
