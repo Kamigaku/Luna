@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.kamigaku.luna.entity.Player;
+import com.kamigaku.luna.listener.PlayerContactListener;
 
 public class Level {
 	
@@ -29,14 +30,14 @@ public class Level {
     public static final float SCALING = 0.8f;
     public World world;
     
-    public Level(String pathForMap) {
+    public Level(String pathForMap, float gravity) {
 		this.screenWidth = Gdx.graphics.getWidth() * SCALING;
 		this.screenHeight = Gdx.graphics.getHeight() * SCALING;
 		this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, screenWidth, screenHeight);
         this.camera.position.set((camera.viewportWidth / 2), (camera.viewportHeight / 2), 0);
 		this.camera.update();
-		this.world = new World(new Vector2(0, -9.8f), true);
+		this.world = new World(new Vector2(0, gravity), true);
     	this.map = new TmxMapLoader().load(pathForMap);
         this.mapHeight = map.getProperties().get("height", Integer.class);
         this.mapWidth = map.getProperties().get("width", Integer.class);

@@ -18,6 +18,8 @@ public class Player {
 	public float vectorY;
 	public float maxVectorX;
 	public float maxVectorY;
+	public final int sizeX = 30;
+	public final int sizeY = 30;
 	
 	
 	public Player(int positionX, int positionY, int tileHeight, World world) {
@@ -26,7 +28,7 @@ public class Player {
 		bodyDefPlayer.position.set(positionX, (positionY * tileHeight) + 50);
 		playerBody = world.createBody(bodyDefPlayer);
 		polygonPlayer = new PolygonShape();
-		polygonPlayer.setAsBox(50, 50);
+		polygonPlayer.setAsBox(sizeX, sizeY);
 		fixturePlayer = new FixtureDef();
 		fixturePlayer.shape = polygonPlayer;
 		fixturePlayer.density = 0.8f;
@@ -34,6 +36,7 @@ public class Player {
 		fixturePlayer.restitution = 0.0f;
 		playerBody.createFixture(fixturePlayer);
 		playerBody.setFixedRotation(true);
+		playerBody.setUserData(new String("player"));
 		this.vectorX = 5f;
 		this.vectorY = 5f;
 		this.maxVectorX = 70f;
