@@ -4,22 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.kamigaku.luna.MainClass;
 import com.kamigaku.luna.entity.Player;
 import com.kamigaku.luna.gameScreen.Level;
 import com.kamigaku.luna.gameScreen.Level1_1;
+import com.kamigaku.luna.logger.Log;
 
 public class TestScreen implements Screen {
         
         private Level levelDatas;
         private MainClass game;
         private Box2DDebugRenderer rendererBox2D;
+        private FPSLogger logger;
         private boolean toLeft, toRight;
         private Player player;
 
@@ -31,18 +30,27 @@ public class TestScreen implements Screen {
         public void render(float delta) {
                 Gdx.gl.glClearColor(0, 0, 0, 1);
                 Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-                mouvementPlayer();
-                this.levelDatas.rendererMap.setView(this.levelDatas.camera);
                 this.levelDatas.rendererMap.render();
+                this.levelDatas.player.mouvementPlayer(this.levelDatas, this.toLeft, this.toRight);
+                this.levelDatas.rendererMap.setView(this.levelDatas.camera);
                 this.rendererBox2D.render(levelDatas.world, levelDatas.camera.combined);
                 this.levelDatas.world.step(delta * 3, 8, 3);
+                this.levelDatas.mouvementCamera();
                 this.levelDatas.camera.update();
+                this.levelDatas.lune.getHandler().updateAndRender();
+                this.levelDatas.lune.updateLune(delta, this.levelDatas.camera, this.levelDatas.camera.position.x, this.levelDatas.camera.position.y);
+//                this.logger.log();
+//                Log.logState(player);
+                try {
                 this.levelDatas.camera.apply(Gdx.gl10);
+                } catch(NullPointerException exp) {
+                }
         }
 
-        @Override
+		@Override
         public void show() {
-                levelDatas = new Level1_1("map/map2.tmx", -9.8f);
+                levelDatas = new Level1_1("map/map3.tmx", -9.8f);
+                this.logger = new FPSLogger();
                 this.player = levelDatas.player;
                 this.toLeft = this.toRight = false;
                 rendererBox2D = new Box2DDebugRenderer();
@@ -96,7 +104,8 @@ public class TestScreen implements Screen {
                         
                         @Override
                         public boolean mouseMoved(int screenX, int screenY) {
-                                return false;
+//                            levelDatas.lune.getHandler().s
+                            return false;
                         }
                         
                         @Override
@@ -166,74 +175,7 @@ public class TestScreen implements Screen {
         	this.levelDatas.rendererMap.dispose();
         	this.levelDatas.world.dispose();
         	this.rendererBox2D.dispose();
+        	this.player.fixturePlayer.shape.dispose();
         }
-
-        private void mouvementPlayer() {
-        	this.player.resetMouvement();
-             Array<Contact> contacts = this.levelDatas.world.getContactList();
-             try {
-                 for(Contact contact : contacts) {
-                     if(contact.getFixtureA().equals(player.playerBody.getFixtureList().get(0))) {
-                             if(!this.player.againstWall)
-                                     this.levelDatas.bodyIsWall(contact.getFixtureB().getBody());
-                     }
-                     if(contact.getFixtureB().equals(player.playerBody.getFixtureList().get(0))) {
-                             if(!this.player.againstWall)
-                                     this.levelDatas.bodyIsWall(contact.getFixtureA().getBody());
-                     }
-                 }
-             } catch(GdxRuntimeException exp) {
-             }
-             
-             if(!this.player.againstWall) {
-                     this.player.jumpedOnce = false;
-             }
-             
-             if(player.playerBody.getLinearVelocity().y < -0.01f) { // le joueur tombe
-                     this.player.falling = true;
-                     this.player.jumping = false;
-             }
-             else if(player.playerBody.getLinearVelocity().y > 0.01f) { // le joueur est en train de sauter
-                     this.player.falling = false;
-                     this.player.jumping = true;
-             }
-             else { // le joueur fait du surplace
-                     this.player.falling = this.player.jumping = false;
-             }
-             
-             if(this.player.againstWall && this.player.falling) { // il est contre un mur et tombe (chute ralentie)
-            	 player.playerBody.applyLinearImpulse(new Vector2(player.playerBody.getLinearVelocity().x, player.playerBody.getLinearVelocity().y * 0.5f), player.playerBody.getWorldCenter(), true);
-             }
-             if(this.player.wantToJump && !this.player.againstWall && !this.player.jumping && !this.player.falling) {
-            	 this.player.wantToJump = false;
-                     if(toLeft) {
-                             player.playerBody.applyLinearImpulse(new Vector2(50000 * -player.maxVectorX, 50000 * player.maxVectorY), player.playerBody.getWorldCenter(), true);
-                     }
-                     else if(toRight) {
-                             player.playerBody.applyLinearImpulse(new Vector2(50000 * player.maxVectorX, 50000 * player.maxVectorY), player.playerBody.getWorldCenter(), true);
-                     }
-                     else {
-                             player.playerBody.applyLinearImpulse(new Vector2(0, 50000 * player.maxVectorY), player.playerBody.getWorldCenter(), true);
-                     }
-             }
-             else if(this.player.wantToJump && this.player.againstWall && !this.player.jumpedOnce) {
-            	 	this.player.wantToJump = false;
-                     if(toRight) {
-                             player.playerBody.applyLinearImpulse(new Vector2(50000 * -player.maxVectorX, 50000 * player.maxVectorY * 2), player.playerBody.getWorldCenter(), true);
-                     }
-                     else if(toLeft) {
-                             player.playerBody.applyLinearImpulse(new Vector2(50000 * player.maxVectorX, 50000 * player.maxVectorY * 2), player.playerBody.getWorldCenter(), true);
-                     }
-                     this.player.jumpedOnce = true;
-             }
-             else if((toRight || toLeft) && !this.player.jumping) {
-                     if(toRight) {
-                             player.playerBody.applyLinearImpulse(new Vector2(50 * player.maxVectorX, player.playerBody.getLinearVelocity().y), player.playerBody.getWorldCenter(), true);
-                     }
-                     else if(toLeft) {
-                             player.playerBody.applyLinearImpulse(new Vector2(50 * -player.maxVectorX, player.playerBody.getLinearVelocity().y), player.playerBody.getWorldCenter(), true);
-                     }         
-             }
-             this.player.wantToJump = false;
-        }
+        
 }
