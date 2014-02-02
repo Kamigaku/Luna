@@ -31,7 +31,8 @@ public class TestScreen implements Screen {
                 Gdx.gl.glClearColor(0, 0, 0, 1);
                 Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
                 this.levelDatas.rendererMap.render();
-                this.levelDatas.player.mouvementPlayer(this.levelDatas, this.toLeft, this.toRight);
+//                this.levelDatas.player.mouvementPlayer(this.levelDatas, this.toLeft, this.toRight);
+                this.levelDatas.player.mouvementPlayer(this.levelDatas);
                 this.levelDatas.rendererMap.setView(this.levelDatas.camera);
                 this.rendererBox2D.render(levelDatas.world, levelDatas.camera.combined);
                 this.levelDatas.world.step(delta * 3, 8, 3);
@@ -40,7 +41,7 @@ public class TestScreen implements Screen {
                 this.levelDatas.lune.getHandler().updateAndRender();
                 this.levelDatas.lune.updateLune(delta, this.levelDatas.camera, this.levelDatas.camera.position.x, this.levelDatas.camera.position.y);
 //                this.logger.log();
-//                Log.logState(player);
+                Log.logState(player);
                 try {
                 this.levelDatas.camera.apply(Gdx.gl10);
                 } catch(NullPointerException exp) {
@@ -52,16 +53,15 @@ public class TestScreen implements Screen {
                 levelDatas = new Level1_1("map/map3.tmx", -9.8f);
                 this.logger = new FPSLogger();
                 this.player = levelDatas.player;
-                this.toLeft = this.toRight = false;
                 rendererBox2D = new Box2DDebugRenderer();
                 Gdx.input.setInputProcessor(new InputProcessor() {
                         
                         @Override
                         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
                     		if(toLeft)
-                    			toLeft = false;
+                    			player.toLeft = false;
                     		if(toRight)
-                    			toRight = false;
+                    			player.toRight = false;
                     		if(player.wantToJump)
                     			player.wantToJump = false;
                             return false;
@@ -71,13 +71,13 @@ public class TestScreen implements Screen {
                         public boolean touchDragged(int screenX, int screenY, int pointer) {
                         	int width = Gdx.graphics.getWidth();
                         	if(screenX < width / 3) {
-                        		toLeft = true;
+                        		player.toLeft = true;
                         	}
                         	if(screenX >= (width / 3) && screenX < (width / 3) * 2) {
                         		player.wantToJump = true;
                         	}
                         	if(screenX >= (width / 3) * 2) {
-                        		toRight = true;
+                        		player.toRight = true;
                         	}
                             return false;
                         }
@@ -86,13 +86,13 @@ public class TestScreen implements Screen {
                         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                             	int width = Gdx.graphics.getWidth();
                             	if(screenX < width / 3) {
-                            		toLeft = true;
+                            		player.toLeft = true;
                             	}
                             	if(screenX >= (width / 3) && screenX < (width / 3) * 2) {
                             		player.wantToJump = true;
                             	}
                             	if(screenX >= (width / 3) * 2) {
-                            		toRight = true;
+                            		player.toRight = true;
                             	}
                                     return false;
                         }
@@ -111,10 +111,10 @@ public class TestScreen implements Screen {
                         @Override
                         public boolean keyUp(int keycode) {
                                 if(keycode == Keys.Q) {
-                                        toLeft = false;
+                                		player.toLeft = false;
                                 }
                                 if(keycode == Keys.D) {
-                                        toRight = false;                                        
+                                		player.toRight = false;                                        
                                 }
                                 return false;
                         }
@@ -122,10 +122,10 @@ public class TestScreen implements Screen {
                         @Override
                         public boolean keyTyped(char character) {
                                 if(character == 'd') {
-                                        toRight = true;
+                                		player.toRight = true;
                                 }
                                 if(character == 'q') {
-                                        toLeft = true;
+                                		player.toLeft = true;
                                 }
                                 return false;
                         }
@@ -136,15 +136,15 @@ public class TestScreen implements Screen {
                                         player.wantToJump = true;
                                 }
                                 if(keycode == Keys.Q) {
-                                        toLeft = true;
-                                        toRight = false;
+                                        player.toLeft = true;
+                                        player.toRight = false;
                                 }
                                 if(keycode == Keys.D) {
-                                        toLeft = false;
-                                        toRight = true;                                        
+                                		player.toLeft = false;
+                                		player.toRight = true;                                        
                                 }
                                 if(keycode == Keys.D && keycode == Keys.Q) {
-                                        toLeft = toRight = false;                                        
+                                		player.toLeft = player.toRight = false;                                        
                                 }
                                 return false;
                         }

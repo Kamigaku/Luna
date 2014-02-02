@@ -7,6 +7,7 @@ import com.kamigaku.luna.screens.MenuScreen;
 public class MainClass extends Game {
 	
 	private Screen currentScreen;
+	public static final int PIXELS = 64;
 
 	@Override
 	public void create() {
