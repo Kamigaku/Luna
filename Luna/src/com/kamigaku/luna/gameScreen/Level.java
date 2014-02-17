@@ -1,5 +1,6 @@
 package com.kamigaku.luna.gameScreen;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import net.dermetfan.utils.libgdx.box2d.Box2DMapObjectParser;
@@ -71,27 +72,30 @@ public class Level {
     
     private void getPositionContact(Array<Contact> contacts) {
         Vector2 positionPlayer = this.player.getTargetPos();
+        float relPosPlayerXMin = positionPlayer.x - this.player.sizeX;
+        float relPosPlayerXMax = positionPlayer.x + this.player.sizeX;
+        float relPosPlayerYMin = positionPlayer.y - this.player.sizeY;
+        float relPosPlayerYMax = positionPlayer.y + this.player.sizeY;
         ArrayList<Vector2> pointsContact = new ArrayList<Vector2>();
         for(Contact contact : contacts) {
         	for (int i = 0; i < contact.getWorldManifold().getNumberOfContactPoints(); i++) {
         		   pointsContact.add(new Vector2(contact.getWorldManifold().getPoints()[i].x, contact.getWorldManifold().getPoints()[i].y));
     		}
-        }
+        }        
         for(Vector2 pointContact : pointsContact) {
-        	if(pointContact.x < positionPlayer.x && pointContact.y < positionPlayer.y) {
-        		this.player.contactBottomLeft = true;
+        	if(pointContact.x <= relPosPlayerXMin && pointContact.y >= relPosPlayerYMin && pointContact.y <= relPosPlayerYMax) {
+        		this.player.contactLeft = true;
         	}
-        	if(pointContact.x < positionPlayer.x && pointContact.y > positionPlayer.y) {
-        		this.player.contactTopLeft = true;
+        	if(pointContact.x >= relPosPlayerXMax && pointContact.y >= relPosPlayerYMin && pointContact.y <= relPosPlayerYMax) {
+        		this.player.contactRight = true;
         	}
-        	if(pointContact.x > positionPlayer.x && pointContact.y < positionPlayer.y) {
-        		this.player.contactBottomRight = true;
+        	if(pointContact.y <= relPosPlayerYMin && pointContact.x >= relPosPlayerXMin && pointContact.x <= relPosPlayerXMax) {
+        		this.player.contactBot = true;
         	}
-        	if(pointContact.x > positionPlayer.x && pointContact.y > positionPlayer.y) {
-        		this.player.contactTopRight = true;
+        	if(pointContact.y >= relPosPlayerYMax && pointContact.x >= relPosPlayerXMin && pointContact.x <= relPosPlayerXMax) {
+        		this.player.contactTop = true;
         	}
-        }
-    
+        }    
     }
     
     public void mouvementCamera() {

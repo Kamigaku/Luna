@@ -111,11 +111,13 @@ public class TestScreen implements Screen {
                         @Override
                         public boolean keyUp(int keycode) {
                                 if(keycode == Keys.Q) {
-                                		player.toLeft = false;
+                            		player.toLeft = false;
                                 }
                                 if(keycode == Keys.D) {
-                                		player.toRight = false;                                        
+                            		player.toRight = false;                                        
                                 }
+                                if(keycode == Keys.SPACE)
+                                	player.wantToJump = false;
                                 return false;
                         }
                         
