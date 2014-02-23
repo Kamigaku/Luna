@@ -2,6 +2,7 @@ package com.kamigaku.luna;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
 import com.kamigaku.luna.screens.MenuScreen;
 
 public class MainClass extends Game {
@@ -11,6 +12,7 @@ public class MainClass extends Game {
 
 	@Override
 	public void create() {
+		Texture.setEnforcePotImages(false);
 		setCurrentScreen(new MenuScreen(this));
 		setScreen(getCurrentScreen());
 	}

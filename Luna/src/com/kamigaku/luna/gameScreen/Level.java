@@ -1,12 +1,14 @@
 package com.kamigaku.luna.gameScreen;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import net.dermetfan.utils.libgdx.box2d.Box2DMapObjectParser;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -21,7 +23,8 @@ import com.kamigaku.luna.entity.Player;
 
 public class Level {
         
-    private TiledMap map;
+	public SpriteBatch batch;
+    public TiledMap map;
     public OrthographicCamera camera;
     public OrthogonalTiledMapRenderer rendererMap;
     public Box2DMapObjectParser parser;
@@ -31,12 +34,12 @@ public class Level {
     public int mapHeight;
     public int tileHeight;
     public int tileWidth;
-    private float screenWidth;
-    private float screenHeight;
+    public float screenWidth, screenHeight;
     public float scaling;
     public World world;
     
     public Level(String pathForMap, float gravity, int playerPositionX, int playerPositionY, float scaling, float posXLune, float posYLune) {
+    	this.batch = new SpriteBatch();
     	this.scaling = scaling;
 		this.screenWidth = Gdx.graphics.getWidth() * this.scaling;
 		this.screenHeight = Gdx.graphics.getHeight() * this.scaling;
@@ -56,6 +59,102 @@ public class Level {
 		this.parser.load(world, map.getLayers().get("Body"));
 		this.lune = new Lune(posXLune, posYLune, world, camera);
 		this.player = new Player(playerPositionX, playerPositionY, this.tileWidth, this.tileHeight, this.world);
+        Gdx.input.setInputProcessor(new InputProcessor() {
+            
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        		if(player.toLeft)
+        			player.toLeft = false;
+        		if(player.toRight)
+        			player.toRight = false;
+        		if(player.wantToJump)
+        			player.wantToJump = false;
+                return false;
+            }
+            
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+            	int width = Gdx.graphics.getWidth();
+            	if(screenX < width / 3) {
+            		player.toLeft = true;
+            	}
+            	if(screenX >= (width / 3) && screenX < (width / 3) * 2) {
+            		player.wantToJump = true;
+            	}
+            	if(screenX >= (width / 3) * 2) {
+            		player.toRight = true;
+            	}
+                return false;
+            }
+            
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                	int width = Gdx.graphics.getWidth();
+                	if(screenX < width / 3) {
+                		player.toLeft = true;
+                	}
+                	if(screenX >= (width / 3) && screenX < (width / 3) * 2) {
+                		player.wantToJump = true;
+                	}
+                	if(screenX >= (width / 3) * 2) {
+                		player.toRight = true;
+                	}
+                        return false;
+            }
+                                    
+            @Override
+            public boolean scrolled(int amount) {
+                    return false;
+            }
+            
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                return false;
+            }
+            
+            @Override
+            public boolean keyUp(int keycode) {
+                    if(keycode == Keys.Q) {
+                		player.toLeft = false;
+                    }
+                    if(keycode == Keys.D) {
+                		player.toRight = false;                                        
+                    }
+                    if(keycode == Keys.SPACE)
+                    	player.wantToJump = false;
+                    return false;
+            }
+            
+            @Override
+            public boolean keyTyped(char character) {
+                    if(character == 'd') {
+                    		player.toRight = true;
+                    }
+                    if(character == 'q') {
+                    		player.toLeft = true;
+                    }
+                    return false;
+            }
+            
+            @Override
+            public boolean keyDown(int keycode) {
+                    if(keycode == Keys.SPACE) {
+                            player.wantToJump = true;
+                    }
+                    if(keycode == Keys.Q) {
+                            player.toLeft = true;
+                            player.toRight = false;
+                    }
+                    if(keycode == Keys.D) {
+                    		player.toLeft = false;
+                    		player.toRight = true;                                        
+                    }
+                    if(keycode == Keys.D && keycode == Keys.Q) {
+                    		player.toLeft = player.toRight = false;                                        
+                    }
+                    return false;
+            }
+        });
     }
     
     public void bodyIsWall(Body body, Array<Contact> contacts) {

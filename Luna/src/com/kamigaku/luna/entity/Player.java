@@ -62,7 +62,6 @@ public class Player {
                 
         public void mouvementPlayer(Level levelDatas) {
         	this.resetMouvement();
-        	// appel à la fonction des collisions
             Array<Contact> contacts = levelDatas.world.getContactList();
             try {
                 for(Contact contact : contacts) {
@@ -78,8 +77,6 @@ public class Player {
             if(this.playerBody.getLinearVelocity().y == 0f && !againstWall) {
             	this.againstObstacle = true;
             }
-        	//fin appel
-        	// 1er cas : il est contre un obstacle autre qu'un mur pour rebondir
         	if(this.againstObstacle) {
         		this.falling = false;
         		if(this.playerBody.getLinearVelocity().y < 0f) {
@@ -104,21 +101,16 @@ public class Player {
         			this.wantToJump = false;
         			this.jumping = true;
         		}
-        		else if(toLeft && !toRight && !wantToJump && !jumping) {
+        		else if(toLeft && !toRight && !wantToJump && !jumping && !contactTop) {
         			this.playerBody.applyLinearImpulse(new Vector2((MainClass.PIXELS * 20) * -maxVectorX, (MainClass.PIXELS * 7) * -maxVectorY), playerBody.getWorldCenter(), true);
         		}
-        		else if(!toLeft && toRight && !wantToJump && !jumping) {
+        		else if(!toLeft && toRight && !wantToJump && !jumping && !contactTop) {
         			this.playerBody.applyLinearImpulse(new Vector2((MainClass.PIXELS * 20) * maxVectorX, (MainClass.PIXELS * 7) * -maxVectorY), playerBody.getWorldCenter(), true);
         		}
         		else {
     				this.playerBody.applyLinearImpulse(new Vector2(this.playerBody.getLinearVelocity().x * -150, this.playerBody.getLinearVelocity().y), playerBody.getWorldCenter(), true);
         		}
         	}
-        	// Fin 1er cas
-        	
-        	
-        	
-        	// 2ème cas : il est contre un mur qui lui permet de rebondir
         	else if(this.againstWall && !this.againstObstacle) {
         		this.againstObstacle = false;
         		this.falling = false;
@@ -163,11 +155,6 @@ public class Player {
     				this.playerBody.applyLinearImpulse(new Vector2(this.playerBody.getLinearVelocity().x * -150, this.playerBody.getLinearVelocity().y), playerBody.getWorldCenter(), true);
         		}	
         	}
-        	// Fin 2ème cas
-        	
-        	
-        	
-        	// 3ème cas : il tombe, n'est pas contre un mur ni un obstacle
         	else {
         		if(this.playerBody.getLinearVelocity().y > 0f) {
         			this.jumping = true;
@@ -183,10 +170,7 @@ public class Player {
             			this.playerBody.applyLinearImpulse(new Vector2(maxVectorX * 40, this.playerBody.getLinearVelocity().y), playerBody.getWorldCenter(), true);
             		}
         		}
-        		
-        		// il tombe
         	}
-        	// Fin 3ème cas
         	
         }
         
