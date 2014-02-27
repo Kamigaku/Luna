@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.kamigaku.luna.MainClass;
+import com.kamigaku.luna.gameScreen.Level1_1;
 
 public class MenuScreen implements Screen {
         
@@ -26,7 +27,7 @@ public class MenuScreen implements Screen {
         private BitmapFont font;
         private TextButton btnPlay;
         private MainClass game;
-        private float percentX, percentY;
+        private int widthScreen, heightScreen;
         
         public MenuScreen(MainClass game) {
                 this.game = game;
@@ -36,16 +37,9 @@ public class MenuScreen implements Screen {
         public void render(float delta) {
                 Gdx.gl.glClearColor(0, 0, 0, 0);
                 Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-                float sizeXImg = Gdx.graphics.getWidth() * this.percentX;
-                float sizeYImg = Gdx.graphics.getHeight() * this.percentY;
-                float scaleXImg = sizeXImg / this.logo.getWidth();
-                float scaleYImg = sizeYImg / this.logo.getHeight();
-                float positionLogoX = (Gdx.graphics.getWidth() / 2) - ((this.logo.getWidth() * scaleXImg) / 2 );
-                float positionLogoY = Gdx.graphics.getHeight() - (this.logo.getHeight() * scaleYImg);
-                System.out.println(positionLogoY);
                 batch.begin();
-                batch.draw(new TextureRegion(this.logo), positionLogoX, positionLogoY, 0f, 0f, 
-                		this.logo.getWidth(), this.logo.getHeight(), scaleXImg, scaleYImg, 0f); 
+                batch.draw(new TextureRegion(this.logo), (this.widthScreen / 2) - (this.logo.getWidth() / 2), 
+                		this.heightScreen - this.logo.getHeight() - 50, 0f, 0f, this.logo.getWidth(), this.logo.getHeight(), 1f, 1f, 0f); 
                 batch.end();
                 stage.act();
                 stage.draw();
@@ -60,15 +54,8 @@ public class MenuScreen implements Screen {
                 batch = new SpriteBatch();        
                 stage = new Stage();
                 logo = new Texture(Gdx.files.internal("tilesets/logoluna.png"));
-                int widthBase = Gdx.graphics.getWidth();
-                int heightBase = Gdx.graphics.getHeight();
-                int logoWidth = this.logo.getWidth();
-                int logoHeight = this.logo.getHeight();
-                System.out.println(logoWidth + " " + logoHeight);
-                System.out.println(widthBase + " " + heightBase);
-                this.percentX = (float)logoWidth / (float)widthBase;
-                this.percentY = (float)logoHeight / (float)heightBase;
-                System.out.println(this.percentX + " " + this.percentY);
+                this.widthScreen = Gdx.graphics.getWidth();
+                this.heightScreen = Gdx.graphics.getHeight();
                 font = new BitmapFont(Gdx.files.internal("font/impact25.fnt"));        
                 TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("buttons/buttons.pack"));                
                 Skin skin = new Skin(atlas);                
@@ -87,7 +74,7 @@ public class MenuScreen implements Screen {
                         @Override
                         public boolean touchDown(InputEvent event, float x, float y,
                                         int pointer, int button) {
-                                game.setCurrentScreen(new TestScreen(game));
+                                game.setCurrentScreen(new Level1_1(game));
                                 game.setScreen(game.getCurrentScreen());
                                 return super.touchDown(event, x, y, pointer, button);
                         }
